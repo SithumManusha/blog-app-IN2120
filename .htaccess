@@ -1,0 +1,19 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Prevent direct access to .env and sensitive folders
+    RewriteRule ^\.env - [F,L,NC]
+    RewriteRule ^app/ - [F,L,NC]
+    RewriteRule ^database/ - [F,L,NC]
+    RewriteRule ^views/ - [F,L,NC]
+
+    # Rewrite all requests to public/
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+# Block access to hidden files
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
