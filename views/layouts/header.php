@@ -111,8 +111,13 @@ $currentUser = Auth::user();
 
                         <!-- User Profile Dropdown Button -->
                         <div class="relative group">
+                            <?php 
+                            $avatarUrl = (!empty($currentUser['avatar']) && !str_contains($currentUser['avatar'], 'unsplash')) 
+                                ? $currentUser['avatar'] 
+                                : 'https://ui-avatars.com/api/?name=' . urlencode($currentUser['username']) . '&background=4f46e5&color=fff&bold=true';
+                            ?>
                             <button class="flex items-center gap-2 p-1 rounded-full ring-2 ring-transparent group-hover:ring-brand-500/30 transition-all">
-                                <img src="<?= htmlspecialchars($currentUser['avatar']) ?>" alt="Avatar" class="w-8 h-8 rounded-full object-cover">
+                                <img src="<?= htmlspecialchars($avatarUrl) ?>" alt="Avatar" class="w-8 h-8 rounded-full object-cover">
                                 <span class="hidden lg:inline text-sm font-semibold text-gray-700 dark:text-gray-300"><?= htmlspecialchars($currentUser['username']) ?></span>
                                 <i class="fa-solid fa-chevron-down text-xs text-gray-400"></i>
                             </button>

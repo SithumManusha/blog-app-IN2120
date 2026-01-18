@@ -40,7 +40,10 @@ class Auth {
         $_SESSION['username'] = $user['username'];
         $_SESSION['email']    = $user['email'];
         $_SESSION['role']     = $user['role'];
-        $_SESSION['avatar']   = $user['avatar'] ?? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80';
+        $username = $user['username'] ?? 'User';
+        $_SESSION['avatar']   = !empty($user['avatar']) && !str_contains($user['avatar'], 'unsplash') 
+            ? $user['avatar'] 
+            : 'https://ui-avatars.com/api/?name=' . urlencode($username) . '&background=4f46e5&color=fff&bold=true';
     }
 
     public static function logout(): void {

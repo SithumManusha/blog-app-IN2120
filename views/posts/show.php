@@ -43,7 +43,12 @@ $isAuthorOrAdmin = $currentUser && ($currentUser['id'] === $post['user_id'] || $
         <!-- Author Bar & Actions -->
         <div class="flex flex-wrap items-center justify-between gap-4 py-4 border-y border-gray-100 dark:border-gray-800">
             <div class="flex items-center gap-3">
-                <img src="<?= htmlspecialchars($post['author_avatar']) ?>" alt="Author" class="w-11 h-11 rounded-full object-cover">
+                <?php 
+                $authorAvatar = (!empty($post['author_avatar']) && !str_contains($post['author_avatar'], 'unsplash')) 
+                    ? $post['author_avatar'] 
+                    : 'https://ui-avatars.com/api/?name=' . urlencode($post['author_name']) . '&background=4f46e5&color=fff&bold=true';
+                ?>
+                <img src="<?= htmlspecialchars($authorAvatar) ?>" alt="Author" class="w-11 h-11 rounded-full object-cover">
                 <div>
                     <h3 class="text-sm font-bold text-gray-900 dark:text-white"><?= htmlspecialchars($post['author_name']) ?></h3>
                     <p class="text-xs text-gray-500"><?= date('F d, Y', strtotime($post['created_at'])) ?></p>
@@ -141,7 +146,7 @@ $isAuthorOrAdmin = $currentUser && ($currentUser['id'] === $post['user_id'] || $
 
     <!-- Author Biography Box -->
     <div class="my-10 p-6 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 flex items-start gap-4">
-        <img src="<?= htmlspecialchars($post['author_avatar']) ?>" alt="Author" class="w-14 h-14 rounded-full object-cover">
+        <img src="<?= htmlspecialchars($authorAvatar) ?>" alt="Author" class="w-14 h-14 rounded-full object-cover">
         <div>
             <h4 class="text-base font-bold text-gray-900 dark:text-white mb-1">Written by <?= htmlspecialchars($post['author_name']) ?></h4>
             <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed"><?= htmlspecialchars($post['author_bio'] ?? 'Full-stack software architect & tech explorer.') ?></p>
@@ -188,7 +193,12 @@ $isAuthorOrAdmin = $currentUser && ($currentUser['id'] === $post['user_id'] || $
             <?php foreach ($comments as $comm): ?>
                 <div class="p-4 rounded-xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800/80 flex items-start justify-between gap-4">
                     <div class="flex items-start gap-3">
-                        <img src="<?= htmlspecialchars($comm['avatar']) ?>" alt="Avatar" class="w-8 h-8 rounded-full object-cover">
+                        <?php 
+                        $commAvatar = (!empty($comm['avatar']) && !str_contains($comm['avatar'], 'unsplash')) 
+                            ? $comm['avatar'] 
+                            : 'https://ui-avatars.com/api/?name=' . urlencode($comm['username']) . '&background=6366f1&color=fff&bold=true';
+                        ?>
+                        <img src="<?= htmlspecialchars($commAvatar) ?>" alt="Avatar" class="w-8 h-8 rounded-full object-cover">
                         <div>
                             <div class="flex items-center gap-2 mb-1">
                                 <span class="text-xs font-bold text-gray-900 dark:text-white"><?= htmlspecialchars($comm['username']) ?></span>
