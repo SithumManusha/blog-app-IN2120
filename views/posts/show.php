@@ -9,6 +9,9 @@ $currentUser = Auth::user();
 $isAuthorOrAdmin = $currentUser && ($currentUser['id'] === $post['user_id'] || $currentUser['role'] === 'admin');
 ?>
 
+<!-- Reading Progress Bar (Medium-style top indicator) -->
+<div id="reading-progress-bar" class="fixed top-0 left-0 h-1 bg-gradient-to-r from-brand-600 via-indigo-600 to-purple-600 z-50 transition-all duration-75" style="width: 0%;"></div>
+
 <article class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
     <!-- Back Button & Breadcrumb -->
@@ -21,8 +24,8 @@ $isAuthorOrAdmin = $currentUser && ($currentUser['id'] === $post['user_id'] || $
     <!-- Article Header -->
     <header class="mb-8">
         
-        <!-- Category & Reading Time -->
-        <div class="flex items-center gap-3 mb-4">
+        <!-- Category, Reading Time, Views & Interactive Likes -->
+        <div class="flex flex-wrap items-center gap-3 mb-4">
             <?php if (!empty($post['category_name'])): ?>
                 <a href="?route=home&category=<?= urlencode($post['category_slug']) ?>" 
                     class="px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider bg-brand-50 dark:bg-brand-950 text-brand-600 dark:text-brand-400">
@@ -33,6 +36,15 @@ $isAuthorOrAdmin = $currentUser && ($currentUser['id'] === $post['user_id'] || $
             <span class="text-xs text-gray-500 font-medium"><i class="fa-regular fa-clock mr-1"></i><?= (int)$post['reading_time'] ?> min read</span>
             <span class="text-xs text-gray-400">•</span>
             <span class="text-xs text-gray-500 font-medium"><i class="fa-regular fa-eye mr-1"></i><?= (int)$post['views'] ?> views</span>
+            <span class="text-xs text-gray-400">•</span>
+
+            <!-- Interactive 1-Click Like / Heart Button -->
+            <button id="btn-like-post" data-post-id="<?= (int)$post['id'] ?>" 
+                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/40 hover:scale-105 active:scale-95 shadow-sm"
+                title="Clap / Like this article">
+                <i id="like-icon" class="fa-solid fa-heart text-xs text-rose-500"></i> 
+                <span id="like-count"><?= (int)($post['likes'] ?? 0) ?></span> likes
+            </button>
         </div>
 
         <!-- Post Title -->
