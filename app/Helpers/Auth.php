@@ -19,12 +19,19 @@ class Auth {
             return null;
         }
 
+        $username = $_SESSION['username'] ?? 'User';
+        $avatar = $_SESSION['avatar'] ?? '';
+        if (empty($avatar) || str_contains($avatar, 'unsplash') || str_contains($avatar, 'photo-')) {
+            $avatar = 'https://ui-avatars.com/api/?name=' . urlencode($username) . '&background=4f46e5&color=fff&bold=true';
+            $_SESSION['avatar'] = $avatar;
+        }
+
         return [
             'id'       => $_SESSION['user_id'],
-            'username' => $_SESSION['username'] ?? '',
+            'username' => $username,
             'email'    => $_SESSION['email'] ?? '',
             'role'     => $_SESSION['role'] ?? 'reader',
-            'avatar'   => $_SESSION['avatar'] ?? ''
+            'avatar'   => $avatar
         ];
     }
 

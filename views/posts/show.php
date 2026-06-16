@@ -211,7 +211,12 @@ $isAuthorOrAdmin = $currentUser && ($currentUser['id'] === $post['user_id'] || $
                 <?= Csrf::getField() ?>
                 <input type="hidden" name="post_id" value="<?= (int)$post['id'] ?>">
                 <div class="flex gap-3">
-                    <img src="<?= htmlspecialchars($currentUser['avatar']) ?>" alt="User" class="w-9 h-9 rounded-full object-cover">
+                    <?php 
+                    $currentAvatar = (!empty($currentUser['avatar']) && !str_contains($currentUser['avatar'], 'unsplash')) 
+                        ? $currentUser['avatar'] 
+                        : 'https://ui-avatars.com/api/?name=' . urlencode($currentUser['username']) . '&background=4f46e5&color=fff&bold=true';
+                    ?>
+                    <img src="<?= htmlspecialchars($currentAvatar) ?>" alt="User" class="w-9 h-9 rounded-full object-cover">
                     <div class="flex-1">
                         <textarea name="content" rows="3" required
                             placeholder="Share your thoughts or ask a question..." 
