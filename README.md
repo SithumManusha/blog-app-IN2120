@@ -36,9 +36,9 @@
 
 ```mermaid
 flowchart TD
-    Client["Client Browser\n(Tailwind CSS + Speech API + AJAX)"]
-    Router["Entry Router\n(public/index.php)"]
-    Auth["Security Layer\n(CSRF, Session Guard, Sanitize)"]
+    Client["Client Browser<br/>(Tailwind CSS + Speech API + AJAX)"]
+    Router["Entry Router<br/>(public/index.php)"]
+    Auth["Security Layer<br/>(CSRF, Session Guard, Sanitize)"]
     
     subgraph Controllers["MVC Controllers"]
         PC["PostController"]
@@ -48,12 +48,12 @@ flowchart TD
     end
     
     subgraph Services["Core Services & Helpers"]
-        GS["GeminiService\n(cURL to Gemini API)"]
+        GS["GeminiService<br/>(cURL to Gemini API)"]
         MD["Markdown Helper"]
-        DBH["Database Helper\n(PDO Singleton)"]
+        DBH["Database Helper<br/>(PDO Singleton)"]
     end
     
-    MySQL[("MySQL / MariaDB\n(Database)")]
+    MySQL[("MySQL / SQLite Database")]
     GeminiAPI["Google Gemini AI Cloud"]
 
     Client -->|HTTP Request| Router
@@ -152,12 +152,14 @@ Open your browser and navigate to: **`http://localhost:8000`**
 
 ---
 
-## 🔑 Default Demo Accounts
+## 👤 User Roles & Authentication
 
-| Role | Email | Password |
-| :--- | :--- | :--- |
-| **Admin** | `admin@aurablog.com` | `admin123` |
-| **Author** | `writer@aurablog.com` | `admin123` |
+The platform features an enterprise role-based authorization model:
+* **Admin**: Complete system governance (publish, manage categories, moderate discussions, and edit articles).
+* **Author**: Compose, polish, and publish articles with full Word-style tools and optional Gemini AI copilot.
+* **Reader**: Browse published articles, generate on-demand AI summaries, listen to audio articles, and comment.
+
+> New users can register immediately via the built-in **`/register`** interface. Initial admin credentials configured during database seeding should be updated before production deployment.
 
 ---
 
