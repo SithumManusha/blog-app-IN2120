@@ -10,6 +10,22 @@ class Database {
 
     public static function getConnection(): ?PDO {
         if (self::$instance === null) {
+            $connection = Env::get('DB_CONNECTION', 'sqlite');
+
+            if ($connection === 'sqlite') {
+                $dbPath = __DIR__ . '/../../database/blog.sqlite';
+                try {
+                    self::$instance = new PDO("sqlite:" . $dbPath, null, null, [
+                        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    ]);
+                    return self::$instance;
+                } catch (PDOException $e) {
+                    error_log("SQLite connection error: " . $e->getMessage());
+                }
+            }
+
+            // Fallback or explicit MySQL
             $host = Env::get('DB_HOST', '127.0.0.1');
             $port = Env::get('DB_PORT', '3306');
             $db   = Env::get('DB_NAME', 'ai_blog_app');
@@ -25,7 +41,19 @@ class Database {
                     PDO::ATTR_EMULATE_PREPARES   => false,
                 ]);
             } catch (PDOException $e) {
-                // If database does not exist yet or connection fails, log and handle gracefully
+                // If MySQL fails, fallback to SQLite automatically so app never crashes!
+                $dbPath = __DIR__ . '/../../database/blog.sqlite';
+                if (file_exists($dbPath)) {
+                    try {
+                        self::$instance = new PDO("sqlite:" . $dbPath, null, null, [
+                            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                        ]);
+                        return self::$instance;
+                    } catch (PDOException $e2) {
+                        error_log("Fallback SQLite error: " . $e2->getMessage());
+                    }
+                }
                 error_log("Database connection error: " . $e->getMessage());
                 return null;
             }
