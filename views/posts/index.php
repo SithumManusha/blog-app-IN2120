@@ -132,7 +132,12 @@ require __DIR__ . '/../layouts/header.php';
 
                             <div class="pt-4 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
                                 <div class="flex items-center gap-2.5">
-                                    <img src="<?= htmlspecialchars($post['author_avatar']) ?>" alt="Author" class="w-7 h-7 rounded-full object-cover">
+                                    <?php 
+                                    $authorAvatar = (!empty($post['author_avatar']) && !str_contains($post['author_avatar'], 'unsplash')) 
+                                        ? $post['author_avatar'] 
+                                        : 'https://ui-avatars.com/api/?name=' . urlencode($post['author_name']) . '&background=4f46e5&color=fff&bold=true';
+                                    ?>
+                                    <img src="<?= htmlspecialchars($authorAvatar) ?>" alt="Author" class="w-7 h-7 rounded-full object-cover">
                                     <span class="text-xs font-semibold text-gray-700 dark:text-gray-300"><?= htmlspecialchars($post['author_name']) ?></span>
                                 </div>
                                 <span class="text-xs text-gray-400"><?= date('M d, Y', strtotime($post['created_at'])) ?></span>
