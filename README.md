@@ -72,7 +72,7 @@ flowchart TD
 ## 📂 Project Structure
 
 ```
-project_of_web_app/
+blog-app-IN2120/
 ├── app/
 │   ├── Config/
 │   │   └── Database.php          # PDO Database Singleton
@@ -139,16 +139,16 @@ project_of_web_app/
 You can run this application using either of two methods:
 
 #### Method A: PHP Built-in Server (Fastest)
-Open your terminal in `project_of_web_app`:
+Open your terminal in the cloned repository:
 ```bash
 php -S localhost:8000
 ```
 Open your browser and navigate to: **`http://localhost:8000`**
 
 #### Method B: XAMPP / WampServer
-1. Copy the entire `project_of_web_app` folder into `C:/xampp/htdocs/`.
+1. Copy the entire `blog-app-IN2120` folder into `C:/xampp/htdocs/`.
 2. Start Apache and MySQL in the XAMPP Control Panel.
-3. Open your browser and navigate to: **`http://localhost/project_of_web_app/`**
+3. Open your browser and navigate to: **`http://localhost/blog-app-IN2120/`**
 
 ---
 
