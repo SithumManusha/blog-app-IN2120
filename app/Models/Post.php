@@ -163,6 +163,17 @@ class Post {
         $stmt->execute(['id' => $id]);
     }
 
+    public static function incrementLikes(int $id): int {
+        $db = Database::getConnection();
+        if (!$db) return 0;
+        $stmt = $db->prepare("UPDATE posts SET likes = COALESCE(likes, 0) + 1 WHERE id = :id");
+        $stmt->execute(['id' => $id]);
+
+        $query = $db->prepare("SELECT likes FROM posts WHERE id = :id");
+        $query->execute(['id' => $id]);
+        return (int)$query->fetchColumn();
+    }
+
     public static function updateAISummary(int $id, string $summary): bool {
         $db = Database::getConnection();
         if (!$db) return false;

@@ -1,11 +1,15 @@
 /**
  * Pulse AI Blog Platform - Core Application JS
- * Dark mode, Toast notifications, and Text-to-Speech (TTS)
+ * Dark mode, Toast notifications, Text-to-Speech (TTS),
+ * Reading Progress Bar, Interactive Likes & Code Block Copy
  */
 
 document.addEventListener('DOMContentLoaded', () => {
     initThemeToggle();
     initTextToSpeech();
+    initReadingProgress();
+    initPostLikes();
+    initCodeBlockCopy();
 });
 
 // 1. Theme Toggle (Dark / Light Mode)
@@ -46,12 +50,10 @@ window.showToast = function(message, type = 'info') {
 
     container.appendChild(toast);
 
-    // Animate in
     requestAnimationFrame(() => {
         toast.classList.remove('translate-x-10', 'opacity-0');
     });
 
-    // Auto remove after 4.5 seconds
     setTimeout(() => {
         toast.classList.add('opacity-0', 'translate-x-5');
         setTimeout(() => toast.remove(), 300);
@@ -83,7 +85,7 @@ function initTextToSpeech() {
             return;
         }
 
-        window.speechSynthesis.cancel(); // Reset any existing speech
+        window.speechSynthesis.cancel();
         const textToRead = articleBody.innerText;
         if (!textToRead.trim()) return;
 
@@ -114,10 +116,84 @@ function initTextToSpeech() {
     if (speedSelect) {
         speedSelect.addEventListener('change', () => {
             if (isPlaying) {
-                // Restart with new speed
                 playBtn.click();
                 playBtn.click();
             }
         });
     }
+}
+
+// 4. Reading Progress Bar (Medium-style top indicator)
+function initReadingProgress() {
+    const progressBar = document.getElementById('reading-progress-bar');
+    if (!progressBar) return;
+
+    window.addEventListener('scroll', () => {
+        const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
+        progressBar.style.width = Math.min(100, Math.max(0, scrolled)) + '%';
+    });
+}
+
+// 5. 1-Click Interactive Like / Heart Button
+function initPostLikes() {
+    const likeBtn = document.getElementById('btn-like-post');
+    const likeCountSpan = document.getElementById('like-count');
+    const likeIcon = document.getElementById('like-icon');
+
+    if (!likeBtn || !likeCountSpan) return;
+
+    likeBtn.addEventListener('click', async () => {
+        const postId = likeBtn.getAttribute('data-post-id');
+        if (!postId) return;
+
+        // Visual pop effect
+        if (likeIcon) {
+            likeIcon.classList.add('scale-150', 'text-rose-600');
+            setTimeout(() => likeIcon.classList.remove('scale-150'), 250);
+        }
+
+        try {
+            const res = await fetch('?route=api.posts.like', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: postId })
+            });
+            const data = await res.json();
+            if (data.success && data.likes !== undefined) {
+                likeCountSpan.textContent = data.likes;
+                showToast('Thanks for liking this article!', 'success');
+            }
+        } catch (err) {
+            // Optimistic fallback increment
+            const current = parseInt(likeCountSpan.textContent) || 0;
+            likeCountSpan.textContent = current + 1;
+        }
+    });
+}
+
+// 6. Code Block Copy Button Auto-Injector
+function initCodeBlockCopy() {
+    const codeBlocks = document.querySelectorAll('pre');
+    codeBlocks.forEach((pre) => {
+        if (pre.querySelector('.btn-copy-code')) return;
+
+        pre.classList.add('relative', 'group');
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'btn-copy-code absolute top-3 right-3 px-2 py-1 text-[11px] font-mono rounded bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity border border-gray-700 flex items-center gap-1';
+        copyBtn.innerHTML = '<i class="fa-regular fa-copy"></i><span>Copy</span>';
+
+        copyBtn.addEventListener('click', () => {
+            const code = pre.querySelector('code') ? pre.querySelector('code').innerText : pre.innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                copyBtn.innerHTML = '<i class="fa-solid fa-check text-emerald-400"></i><span class="text-emerald-400">Copied!</span>';
+                setTimeout(() => {
+                    copyBtn.innerHTML = '<i class="fa-regular fa-copy"></i><span>Copy</span>';
+                }, 2000);
+            });
+        });
+
+        pre.appendChild(copyBtn);
+    });
 }

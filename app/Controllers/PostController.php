@@ -168,4 +168,19 @@ class PostController {
         header('Location: ?route=home&msg=deleted');
         exit;
     }
+
+    public function like(): void {
+        header('Content-Type: application/json');
+        $input = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+        $id = (int)($input['id'] ?? 0);
+
+        if (!$id) {
+            echo json_encode(['success' => false, 'error' => 'Invalid post ID']);
+            exit;
+        }
+
+        $newLikes = Post::incrementLikes($id);
+        echo json_encode(['success' => true, 'likes' => $newLikes]);
+        exit;
+    }
 }

@@ -52,6 +52,10 @@ switch ($route) {
         (new PostController())->show();
         break;
 
+    case 'api.posts.like':
+        (new PostController())->like();
+        break;
+
     // Blog Management
     case 'posts.create':
         (new PostController())->create();
