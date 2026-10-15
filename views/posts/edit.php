@@ -5,6 +5,44 @@ $pageTitle = "Edit Post: " . htmlspecialchars($post['title']) . " | " . ($appNam
 require __DIR__ . '/../layouts/header.php';
 ?>
 
+<!-- Quill.js Rich Text Editor (MS Word-like Toolbar) -->
+<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+<style>
+    .ql-toolbar.ql-snow {
+        border-top-left-radius: 0.75rem;
+        border-top-right-radius: 0.75rem;
+        border-color: #e5e7eb;
+        background: #f9fafb;
+    }
+    .dark .ql-toolbar.ql-snow {
+        border-color: #374151;
+        background: #111827;
+    }
+    .dark .ql-snow .ql-stroke { stroke: #9ca3af; }
+    .dark .ql-snow .ql-fill { fill: #9ca3af; }
+    .dark .ql-snow .ql-picker { color: #9ca3af; }
+    .dark .ql-snow .ql-picker-options { background-color: #1f2937; border-color: #374151; }
+    
+    .ql-container.ql-snow {
+        border-bottom-left-radius: 0.75rem;
+        border-bottom-right-radius: 0.75rem;
+        border-color: #e5e7eb;
+        font-family: inherit;
+        font-size: 1rem;
+        min-height: 400px;
+        background: #ffffff;
+    }
+    .dark .ql-container.ql-snow {
+        border-color: #374151;
+        background: #030712;
+        color: #f3f4f6;
+    }
+    .ql-editor {
+        min-height: 400px;
+        line-height: 1.75;
+    }
+</style>
+
 <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
     <div class="flex items-center justify-between mb-8">
@@ -12,7 +50,7 @@ require __DIR__ . '/../layouts/header.php';
             <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
                 <i class="fa-solid fa-pen-to-square text-brand-600"></i> Edit Article
             </h1>
-            <p class="text-sm text-gray-500 mt-1">Refine and enhance your content with Gemini AI tools.</p>
+            <p class="text-sm text-gray-500 mt-1">Full manual Word-style formatting with optional AI assistance.</p>
         </div>
         <a href="?route=posts.show&slug=<?= urlencode($post['slug']) ?>" class="text-sm font-semibold text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
             View Article
@@ -23,6 +61,8 @@ require __DIR__ . '/../layouts/header.php';
     <form action="?route=posts.update" method="POST" id="post-form">
         <?= Csrf::getField() ?>
         <input type="hidden" name="id" value="<?= (int)$post['id'] ?>">
+        <!-- Hidden input to store Quill HTML content for form submission -->
+        <input type="hidden" name="content" id="post-content">
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
@@ -36,36 +76,101 @@ require __DIR__ . '/../layouts/header.php';
                             Article Title *
                         </label>
                         <button type="button" id="btn-ai-catchy-titles" class="text-xs font-bold text-brand-600 dark:text-brand-400 hover:underline flex items-center gap-1">
-                            <i class="fa-solid fa-wand-magic-sparkles text-[10px]"></i> AI Title Ideas
+                            <i class="fa-solid fa-wand-magic-sparkles text-[10px]"></i> AI Title Ideas (Optional)
                         </button>
                     </div>
                     <input type="text" name="title" id="post-title" required 
                         value="<?= htmlspecialchars($post['title']) ?>"
-                        class="w-full text-lg sm:text-xl font-bold rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-4 focus:ring-2 focus:ring-brand-500 focus:border-transparent text-gray-900 dark:text-white">
+                        class="w-full text-lg sm:text-xl font-bold rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-4 focus:ring-2 focus:ring-brand-500 focus:border-transparent text-gray-900 dark:text-white shadow-sm">
                 </div>
 
-                <!-- AI Copilot Toolbar -->
-                <div class="p-3 rounded-xl bg-gradient-to-r from-brand-50/80 via-purple-50/50 to-indigo-50/80 dark:from-brand-950/40 dark:via-purple-950/20 dark:to-indigo-950/40 border border-brand-100 dark:border-brand-900/40 flex flex-wrap items-center justify-between gap-2">
-                    <span class="text-xs font-bold text-brand-900 dark:text-brand-300 flex items-center gap-1.5">
-                        <i class="fa-solid fa-robot"></i> Gemini Copilot:
+                <!-- Optional AI Assistant Drawer -->
+                <div class="p-3 rounded-xl bg-gradient-to-r from-brand-50/70 via-purple-50/40 to-indigo-50/70 dark:from-brand-950/30 dark:via-purple-950/20 dark:to-indigo-950/30 border border-brand-100/80 dark:border-brand-900/30 flex flex-wrap items-center justify-between gap-2">
+                    <span class="text-xs font-bold text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+                        <i class="fa-solid fa-sparkles text-brand-600"></i> AI Tools (Optional):
                     </span>
                     <div class="flex flex-wrap items-center gap-1.5">
-                        <button type="button" id="btn-ai-fix-grammar" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 border border-gray-200 dark:border-gray-700 shadow-sm flex items-center gap-1">
+                        <button type="button" id="btn-ai-fix-grammar" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 border border-gray-200 dark:border-gray-700 shadow-sm flex items-center gap-1 transition-all">
                             <i class="fa-solid fa-spell-check text-[10px]"></i> Fix Grammar & Tone
                         </button>
-                        <button type="button" id="btn-ai-expand" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 border border-gray-200 dark:border-gray-700 shadow-sm flex items-center gap-1">
-                            <i class="fa-solid fa-arrows-maximize text-[10px]"></i> Expand Draft
+                        <button type="button" id="btn-ai-expand" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 border border-gray-200 dark:border-gray-700 shadow-sm flex items-center gap-1 transition-all">
+                            <i class="fa-solid fa-arrows-maximize text-[10px]"></i> Expand Text
                         </button>
                     </div>
                 </div>
 
-                <!-- Content Area -->
+                <!-- Word-Style WYSIWYG Editor Container -->
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300 mb-2">
-                        Article Content (Markdown Supported) *
-                    </label>
-                    <textarea name="content" id="post-content" rows="18" required 
-                        class="w-full rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-4 font-mono text-sm leading-relaxed focus:ring-2 focus:ring-brand-500 focus:border-transparent text-gray-900 dark:text-white"><?= htmlspecialchars($post['content']) ?></textarea>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
+                            Article Body (Rich Editor) *
+                        </label>
+                        <span class="text-[11px] text-gray-400">Use toolbar for Bold, Headings, Images & Videos</span>
+                    </div>
+
+                    <!-- Quill Editor Toolbar + Body -->
+                    <div id="editor-container" class="shadow-sm">
+                        <!-- Custom Word-Style Toolbar -->
+                        <div id="toolbar-container">
+                            <span class="ql-formats">
+                                <select class="ql-header">
+                                    <option selected>Normal Text</option>
+                                    <option value="1">Heading 1</option>
+                                    <option value="2">Heading 2</option>
+                                    <option value="3">Heading 3</option>
+                                </select>
+                            </span>
+
+                            <span class="ql-formats">
+                                <button class="ql-bold" title="Bold (Ctrl+B)"></button>
+                                <button class="ql-italic" title="Italic (Ctrl+I)"></button>
+                                <button class="ql-underline" title="Underline (Ctrl+U)"></button>
+                                <button class="ql-strike" title="Strikethrough"></button>
+                            </span>
+
+                            <span class="ql-formats">
+                                <select class="ql-color" title="Text Color"></select>
+                                <select class="ql-background" title="Highlight Color"></select>
+                            </span>
+
+                            <span class="ql-formats">
+                                <button class="ql-list" value="ordered" title="Numbered List"></button>
+                                <button class="ql-list" value="bullet" title="Bullet List"></button>
+                                <button class="ql-indent" value="-1" title="Outdent"></button>
+                                <button class="ql-indent" value="+1" title="Indent"></button>
+                            </span>
+
+                            <span class="ql-formats">
+                                <select class="ql-align" title="Text Alignment"></select>
+                            </span>
+
+                            <span class="ql-formats">
+                                <button class="ql-blockquote" title="Quote"></button>
+                                <button class="ql-code-block" title="Code Block"></button>
+                            </span>
+
+                            <span class="ql-formats">
+                                <button class="ql-link" title="Insert Link"></button>
+                                <button class="ql-image" title="Insert Image"></button>
+                                <button class="ql-video" title="Embed YouTube Video"></button>
+                            </span>
+
+                            <span class="ql-formats">
+                                <button class="ql-clean" title="Clear Formatting"></button>
+                            </span>
+                        </div>
+
+                        <!-- Editor Content Area with existing post content -->
+                        <div id="quill-editor">
+                            <?= $post['content'] ?>
+                        </div>
+                    </div>
+
+                    <!-- Word & Character Counter -->
+                    <div class="flex items-center justify-between text-xs text-gray-400 mt-2 px-1">
+                        <span id="char-count">0 characters</span>
+                        <span id="word-count">0 words</span>
+                    </div>
                 </div>
 
             </div>
@@ -91,18 +196,18 @@ require __DIR__ . '/../layouts/header.php';
                 <!-- Cover Image -->
                 <div class="p-5 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm">
                     <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300 mb-2">
-                        Cover Image URL
+                        Cover Banner Image
                     </label>
                     <input type="url" name="cover_image" id="post-cover" 
                         value="<?= htmlspecialchars($post['cover_image']) ?>"
                         class="w-full text-xs rounded-xl bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 p-2.5 text-gray-900 dark:text-white mb-2">
                 </div>
 
-                <!-- AI Tags -->
+                <!-- Tags -->
                 <div class="p-5 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm">
                     <div class="flex items-center justify-between mb-2">
                         <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
-                            AI Tags
+                            Tags & Topics
                         </label>
                         <button type="button" id="btn-ai-tags" class="text-xs font-bold text-brand-600 dark:text-brand-400 hover:underline flex items-center gap-1">
                             <i class="fa-solid fa-tags text-[10px]"></i> Auto-Tag
@@ -113,14 +218,14 @@ require __DIR__ . '/../layouts/header.php';
                         class="w-full text-xs rounded-xl bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 p-2.5 text-gray-900 dark:text-white">
                 </div>
 
-                <!-- AI Summary -->
+                <!-- Summary -->
                 <div class="p-5 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm">
                     <div class="flex items-center justify-between mb-2">
                         <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
-                            AI Executive Summary
+                            Executive Summary (Optional)
                         </label>
                         <button type="button" id="btn-ai-pre-summary" class="text-xs font-bold text-brand-600 dark:text-brand-400 hover:underline flex items-center gap-1">
-                            <i class="fa-solid fa-wand-magic-sparkles text-[10px]"></i> Summarize
+                            <i class="fa-solid fa-wand-magic-sparkles text-[10px]"></i> AI Summary
                         </button>
                     </div>
                     <textarea name="ai_summary" id="post-summary" rows="4" 
@@ -145,5 +250,40 @@ require __DIR__ . '/../layouts/header.php';
     </form>
 
 </div>
+
+<!-- Quill.js Editor Script -->
+<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+<script>
+    const quill = new Quill('#quill-editor', {
+        modules: {
+            toolbar: '#toolbar-container'
+        },
+        theme: 'snow'
+    });
+
+    const hiddenContentInput = document.getElementById('post-content');
+    const form = document.getElementById('post-form');
+    const wordCountSpan = document.getElementById('word-count');
+    const charCountSpan = document.getElementById('char-count');
+
+    function updateCounters() {
+        const text = quill.getText().trim();
+        const words = text ? text.split(/\s+/).filter(Boolean).length : 0;
+        const chars = text.length;
+        if (wordCountSpan) wordCountSpan.textContent = words + ' words';
+        if (charCountSpan) charCountSpan.textContent = chars + ' characters';
+    }
+
+    quill.on('text-change', () => {
+        updateCounters();
+    });
+    updateCounters();
+
+    form.addEventListener('submit', () => {
+        hiddenContentInput.value = quill.root.innerHTML;
+    });
+
+    window.quillEditor = quill;
+</script>
 
 <?php require __DIR__ . '/../layouts/footer.php'; ?>
