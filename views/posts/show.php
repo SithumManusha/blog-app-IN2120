@@ -132,17 +132,49 @@ $isAuthorOrAdmin = $currentUser && ($currentUser['id'] === $post['user_id'] || $
         <?= Markdown::toHtml($post['content']) ?>
     </div>
 
-    <!-- AI Tags -->
-    <?php if (!empty($post['ai_tags'])): ?>
-        <div class="py-6 border-t border-gray-100 dark:border-gray-800 flex flex-wrap items-center gap-2">
-            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider mr-2"><i class="fa-solid fa-tags mr-1"></i> Topics:</span>
-            <?php foreach (explode(',', $post['ai_tags']) as $tag): ?>
-                <span class="text-xs font-medium px-3 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
-                    #<?= htmlspecialchars(trim($tag)) ?>
-                </span>
-            <?php endforeach; ?>
+    <!-- AI Tags & Social Share Bar -->
+    <div class="py-6 border-t border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <?php if (!empty($post['ai_tags'])): ?>
+            <div class="flex flex-wrap items-center gap-2">
+                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider mr-1"><i class="fa-solid fa-tags mr-1"></i> Topics:</span>
+                <?php foreach (explode(',', $post['ai_tags']) as $tag): ?>
+                    <span class="text-xs font-medium px-3 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+                        #<?= htmlspecialchars(trim($tag)) ?>
+                    </span>
+                <?php endforeach; ?>
+            </div>
+        <?php else: ?>
+            <div></div>
+        <?php endif; ?>
+
+        <!-- Social Share Buttons (Medium / WordPress style) -->
+        <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider mr-1">Share:</span>
+            <!-- Twitter / X -->
+            <a href="https://twitter.com/intent/tweet?text=<?= urlencode($post['title']) ?>&url=<?= urlencode('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']) ?>" 
+                target="_blank" rel="noopener noreferrer" 
+                class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black flex items-center justify-center text-xs transition-colors" title="Share on X">
+                <i class="fa-brands fa-x-twitter"></i>
+            </a>
+            <!-- LinkedIn -->
+            <a href="https://www.linkedin.com/sharing/share-offsite/?url=<?= urlencode('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']) ?>" 
+                target="_blank" rel="noopener noreferrer" 
+                class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-blue-600 hover:text-white flex items-center justify-center text-xs transition-colors" title="Share on LinkedIn">
+                <i class="fa-brands fa-linkedin-in"></i>
+            </a>
+            <!-- WhatsApp -->
+            <a href="https://api.whatsapp.com/send?text=<?= urlencode($post['title'] . ' ' . 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']) ?>" 
+                target="_blank" rel="noopener noreferrer" 
+                class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-emerald-600 hover:text-white flex items-center justify-center text-xs transition-colors" title="Share on WhatsApp">
+                <i class="fa-brands fa-whatsapp"></i>
+            </a>
+            <!-- Copy Link Button -->
+            <button onclick="navigator.clipboard.writeText(window.location.href); showToast('Link copied to clipboard!', 'success');" 
+                class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-brand-600 hover:text-white flex items-center justify-center text-xs transition-colors" title="Copy Link">
+                <i class="fa-regular fa-copy"></i>
+            </button>
         </div>
-    <?php endif; ?>
+    </div>
 
     <!-- Author Biography Box -->
     <div class="my-10 p-6 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 flex items-start gap-4">
