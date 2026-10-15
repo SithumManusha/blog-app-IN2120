@@ -34,7 +34,6 @@ require __DIR__ . '/../layouts/header.php';
                     <i class="fa-regular fa-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
                     <input type="email" name="email" required autocomplete="email"
                         placeholder="you@example.com"
-                        value="admin@aurablog.com"
                         class="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent">
                 </div>
             </div>
@@ -47,10 +46,8 @@ require __DIR__ . '/../layouts/header.php';
                     <i class="fa-solid fa-key absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
                     <input type="password" name="password" required autocomplete="current-password"
                         placeholder="••••••••"
-                        value="admin123"
                         class="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent">
                 </div>
-                <p class="text-[11px] text-gray-400 mt-1">Default Demo Admin: <code>admin@aurablog.com</code> / <code>admin123</code></p>
             </div>
 
             <div>
