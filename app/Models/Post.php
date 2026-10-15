@@ -90,8 +90,8 @@ class Post {
         $slug = self::generateUniqueSlug($data['title']);
 
         $stmt = $db->prepare("INSERT INTO posts 
-            (user_id, category_id, title, slug, content, excerpt, cover_image, ai_summary, ai_tags, reading_time, status)
-            VALUES (:user_id, :category_id, :title, :slug, :content, :excerpt, :cover_image, :ai_summary, :ai_tags, :reading_time, :status)");
+            (user_id, category_id, title, slug, content, excerpt, cover_image, ai_summary, ai_tags, reading_time, views, status)
+            VALUES (:user_id, :category_id, :title, :slug, :content, :excerpt, :cover_image, :ai_summary, :ai_tags, :reading_time, :views, :status)");
 
         $stmt->execute([
             'user_id'      => $data['user_id'],
@@ -104,6 +104,7 @@ class Post {
             'ai_summary'   => $data['ai_summary'] ?? null,
             'ai_tags'      => $data['ai_tags'] ?? null,
             'reading_time' => $readingTime,
+            'views'        => 0,
             'status'       => $data['status'] ?? 'published'
         ]);
 
@@ -158,7 +159,7 @@ class Post {
     public static function incrementViews(int $id): void {
         $db = Database::getConnection();
         if (!$db) return;
-        $stmt = $db->prepare("UPDATE posts SET views = views + 1 WHERE id = :id");
+        $stmt = $db->prepare("UPDATE posts SET views = COALESCE(views, 0) + 1 WHERE id = :id");
         $stmt->execute(['id' => $id]);
     }
 

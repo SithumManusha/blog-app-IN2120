@@ -36,7 +36,7 @@ class Markdown {
         $cleaned = preg_replace('/(href|src)\s*=\s*("|\')\s*javascript:[^"\']*("|\')/i', '', $cleaned);
 
         // Make embedded videos (YouTube / Vimeo iframes) responsive with a 16:9 aspect ratio container
-        $cleaned = preg_replace_callback('/<iframe[^>]*src="([^"]*)"[^>]*><\/iframe>/i', function ($matches) {
+        $cleaned = preg_replace_callback('/<iframe[^>]*src=["\']([^"\']*)["\'][^>]*>(?:<\/iframe>)?/i', function ($matches) {
             $src = htmlspecialchars($matches[1], ENT_QUOTES, 'UTF-8');
             // Only allow legitimate video embedding domains
             if (preg_match('/^(https:\/\/www\.youtube\.com\/embed\/|https:\/\/player\.vimeo\.com\/video\/)/i', $src)) {
