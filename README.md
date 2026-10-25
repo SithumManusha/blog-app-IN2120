@@ -8,6 +8,8 @@
 ![Gemini AI](https://img.shields.io/badge/Google_Gemini-AI_1.5_Flash-4285F4?style=for-the-badge&logo=google&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/SithumManusha/blog-app-IN2120)
+[![CI Quality Gate](https://github.com/SithumManusha/blog-app-IN2120/actions/workflows/ci.yml/badge.svg)](https://github.com/SithumManusha/blog-app-IN2120/actions/workflows/ci.yml)
+[![CodeQL Security](https://github.com/SithumManusha/blog-app-IN2120/actions/workflows/codeql.yml/badge.svg)](https://github.com/SithumManusha/blog-app-IN2120/actions/workflows/codeql.yml)
 
 ---
 
