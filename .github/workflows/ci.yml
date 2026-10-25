@@ -1,0 +1,26 @@
+name: CI Quality Gate
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint:
+    name: PHP Syntax Lint & Quality Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, pdo, pdo_mysql
+
+      - name: Validate PHP Syntax (Lint)
+        run: |
+          echo "Linting all project PHP files..."
+          find . -name "*.php" -not -path "./vendor/*" -exec php -l {} \;
